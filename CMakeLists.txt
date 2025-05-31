@@ -12,6 +12,18 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(main src/main.cpp src/Point.h src/Point.cpp src/CubicBezier.h src/CubicBezier.cpp)
+add_executable(
+    main 
+    src/main.cpp
+    
+    src/Point.h
+    src/Point.cpp 
+    
+    src/CubicBezier.h 
+    src/CubicBezier.cpp 
+    
+    src/CurveCreator.h 
+    src/CurveCreator.cpp
+)
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)
