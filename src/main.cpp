@@ -6,9 +6,15 @@
 int main()
 {
     auto window = sf::RenderWindow(sf::VideoMode({800u, 600u}), "CMake SFML Project");
-    window.setFramerateLimit(60);
+    // window.setFramerateLimit(60);
+
+    float mTargetFrameRate = 60.f;
+    float accumulatedTime = 0.f;
+
+    sf::Clock mTickClock{};
 
     bezier::CurveCreator creator{};
+    mTickClock.restart();
 
     while (window.isOpen())
     {
@@ -54,8 +60,17 @@ int main()
             }
         }
 
-        window.clear();
-        creator.Render(window);
-        window.display();
+        float targetDeltaTime = 1.f / mTargetFrameRate;
+
+        float frameDeltaTime = mTickClock.restart().asSeconds();
+        accumulatedTime += frameDeltaTime;
+        while (accumulatedTime > targetDeltaTime)
+        {
+            accumulatedTime -= targetDeltaTime;
+            creator.Tick();
+            window.clear();
+            creator.Render(window);
+            window.display();
+        }
     }
 }

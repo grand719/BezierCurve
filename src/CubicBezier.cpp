@@ -4,8 +4,9 @@ namespace bezier
 {
 
 CubicBezier::CubicBezier(const sf::Vector2f &point0, const sf::Vector2f &point1, const sf::Vector2f &point2,
-                         const sf::Vector2f &point3)
-    : mPoint0{point0}, mPoint1{point1}, mPoint2{point2}, mPoint3{point3}, mPixel{sf::Vector2f{4.f, 4.f}}
+                         const sf::Vector2f &point3, const bool &shouldAnimate)
+    : mPoint0{point0}, mPoint1{point1}, mPoint2{point2}, mPoint3{point3}, mPixel{sf::Vector2f{4.f, 4.f}},
+      mShouldAnimate{shouldAnimate}, mT{0.f}, mControlPoint{sf::Vector2f{0.f, 0.f}}
 {
     mPixel.setFillColor(sf::Color::Red);
     mPixel.setOrigin(sf::Vector2f{2.f, 2.f});
@@ -13,6 +14,67 @@ CubicBezier::CubicBezier(const sf::Vector2f &point0, const sf::Vector2f &point1,
 }
 
 void CubicBezier::Render(sf::RenderWindow &window)
+{
+    mShouldAnimate ? RenderAnimationInternal(window) : RenderInternal(window);
+}
+
+void CubicBezier::Tick()
+{
+    if (mShouldAnimate)
+    {
+        mT = mAnimationPosition / mAnimationSegments;
+
+        mAnimationPosition += 1.f;
+        if (mAnimationPosition >= mAnimationSegments)
+        {
+            mAnimationPosition = 0.f;
+            mT = 0.f;
+        }
+    }
+}
+
+void CubicBezier::RenderAnimationInternal(sf::RenderWindow &window)
+{
+    for (float t = 0.f; t <= mT; t += 1.f / mAnimationSegments)
+    {
+        sf::Vector2f B =
+            bezier2(mPoint0.getPosition(), mPoint1.getPosition(), mPoint2.getPosition(), mPoint3.getPosition(), t);
+
+        mPixel.setPosition(B);
+        window.draw(mPixel);
+    }
+
+    mLines.clear();
+    mLines.resize(6);
+    mLines[0].position = mPoint0.getPosition();
+    mLines[0].color = sf::Color::White;
+    mLines[1].position = mPoint1.getPosition();
+    mLines[1].color = sf::Color::White;
+
+    mLines[2].position = mPoint1.getPosition();
+    mLines[2].color = sf::Color::White;
+    mLines[3].position = mPoint2.getPosition();
+    mLines[3].color = sf::Color::White;
+
+    mLines[4].position = mPoint2.getPosition();
+    mLines[4].color = sf::Color::White;
+    mLines[5].position = mPoint3.getPosition();
+    mLines[5].color = sf::Color::White;
+    window.draw(mLines);
+
+    mPoint0.Render(window);
+    mPoint1.Render(window);
+    mPoint2.Render(window);
+    mPoint3.Render(window);
+
+    sf::Vector2f controlPointPosition =
+        bezier2(mPoint0.getPosition(), mPoint1.getPosition(), mPoint2.getPosition(), mPoint3.getPosition(), mT);
+
+    mControlPoint.setPosition(controlPointPosition);
+    mControlPoint.Render(window);
+}
+
+void CubicBezier::RenderInternal(sf::RenderWindow &window)
 {
     float segments = 200;
     for (int i = 0; i <= segments; ++i)

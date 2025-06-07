@@ -24,7 +24,7 @@ void CurveCreator::CreateCubicBezier()
         sf::Vector2f point0 = mPointsList[0].get()->getPosition();
         sf::Vector2f point1 = mPointsList[1].get()->getPosition();
 
-        mCubicBezierList.push_back(std::make_shared<CubicBezier>(point0, point0, point1, point1));
+        mCubicBezierList.push_back(std::make_shared<CubicBezier>(point0, point0, point1, point1, true));
         mPointsList.clear();
     }
 }
@@ -39,6 +39,14 @@ void CurveCreator::Render(sf::RenderWindow &window)
     for (const auto curve : mCubicBezierList)
     {
         curve.get()->Render(window);
+    }
+}
+
+void CurveCreator::Tick()
+{
+    for (const auto curve : mCubicBezierList)
+    {
+        curve.get()->Tick();
     }
 }
 

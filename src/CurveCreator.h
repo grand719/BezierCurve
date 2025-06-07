@@ -13,6 +13,7 @@ class CurveCreator
     CurveCreator();
     void OnRightPress(sf::Vector2f &position);
     void Render(sf::RenderWindow &window);
+    void Tick();
 
     void OnMouseMove(sf::Vector2f &position);
     void OnLeftPress(sf::Vector2f &position);
