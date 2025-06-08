@@ -35,17 +35,22 @@ void CubicBezier::Tick()
 
 void CubicBezier::RenderAnimationInternal(sf::RenderWindow &window)
 {
+
     for (float t = 0.f; t <= mT; t += 1.f / mAnimationSegments)
     {
         sf::Vector2f B =
-            bezier2(mPoint0.getPosition(), mPoint1.getPosition(), mPoint2.getPosition(), mPoint3.getPosition(), t);
+            bezier2(mPoint0.getPosition(), mPoint1.getPosition(), mPoint2.getPosition(), mPoint3.getPosition(), t)
+                .Final;
 
         mPixel.setPosition(B);
         window.draw(mPixel);
     }
 
+    CubicBezierPoints points =
+        bezier2(mPoint0.getPosition(), mPoint1.getPosition(), mPoint2.getPosition(), mPoint3.getPosition(), mT);
+
     mLines.clear();
-    mLines.resize(6);
+    mLines.resize(12);
     mLines[0].position = mPoint0.getPosition();
     mLines[0].color = sf::Color::White;
     mLines[1].position = mPoint1.getPosition();
@@ -60,6 +65,22 @@ void CubicBezier::RenderAnimationInternal(sf::RenderWindow &window)
     mLines[4].color = sf::Color::White;
     mLines[5].position = mPoint3.getPosition();
     mLines[5].color = sf::Color::White;
+
+    mLines[6].position = points.P01;
+    mLines[6].color = sf::Color::White;
+    mLines[7].position = points.P12;
+    mLines[7].color = sf::Color::White;
+
+    mLines[8].position = points.P12;
+    mLines[8].color = sf::Color::White;
+    mLines[9].position = points.P23;
+    mLines[9].color = sf::Color::White;
+
+    mLines[10].position = points.P012;
+    mLines[10].color = sf::Color::White;
+    mLines[11].position = points.P123;
+    mLines[11].color = sf::Color::White;
+
     window.draw(mLines);
 
     mPoint0.Render(window);
@@ -67,10 +88,7 @@ void CubicBezier::RenderAnimationInternal(sf::RenderWindow &window)
     mPoint2.Render(window);
     mPoint3.Render(window);
 
-    sf::Vector2f controlPointPosition =
-        bezier2(mPoint0.getPosition(), mPoint1.getPosition(), mPoint2.getPosition(), mPoint3.getPosition(), mT);
-
-    mControlPoint.setPosition(controlPointPosition);
+    mControlPoint.setPosition(points.Final);
     mControlPoint.Render(window);
 }
 
@@ -81,7 +99,8 @@ void CubicBezier::RenderInternal(sf::RenderWindow &window)
     {
         float t = static_cast<float>(i) / segments;
         sf::Vector2f B =
-            bezier2(mPoint0.getPosition(), mPoint1.getPosition(), mPoint2.getPosition(), mPoint3.getPosition(), t);
+            bezier2(mPoint0.getPosition(), mPoint1.getPosition(), mPoint2.getPosition(), mPoint3.getPosition(), t)
+                .Final;
 
         mPixel.setPosition(B);
         window.draw(mPixel);
@@ -121,7 +140,7 @@ sf::Vector2f CubicBezier::lerp(const sf::Vector2f &a, const sf::Vector2f &b, flo
     return sf::Vector2f{(1 - t) * a.x + t * b.x, (1 - t) * a.y + t * b.y};
 }
 
-sf::Vector2f CubicBezier::bezier2(sf::Vector2f &p0, sf::Vector2f &p1, sf::Vector2f &p2, sf::Vector2f &p3, float t)
+CubicBezierPoints CubicBezier::bezier2(sf::Vector2f &p0, sf::Vector2f &p1, sf::Vector2f &p2, sf::Vector2f &p3, float t)
 {
     sf::Vector2f P01 = lerp(p0, p1, t);
     sf::Vector2f P12 = lerp(p1, p2, t);
@@ -130,7 +149,9 @@ sf::Vector2f CubicBezier::bezier2(sf::Vector2f &p0, sf::Vector2f &p1, sf::Vector
     sf::Vector2f P012 = lerp(P01, P12, t);
     sf::Vector2f P123 = lerp(P12, P23, t);
 
-    return lerp(P012, P123, t);
+    CubicBezierPoints points{P01, P12, P23, P012, P123, lerp(P012, P123, t)};
+
+    return points;
 }
 
 } // namespace bezier

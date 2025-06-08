@@ -6,6 +6,17 @@
 namespace bezier
 {
 
+struct CubicBezierPoints
+{
+    sf::Vector2f P01;
+    sf::Vector2f P12;
+    sf::Vector2f P23;
+    sf::Vector2f P012;
+    sf::Vector2f P123;
+
+    sf::Vector2f Final;
+};
+
 class CubicBezier
 {
   public:
@@ -17,7 +28,7 @@ class CubicBezier
 
   private:
     sf::Vector2f lerp(const sf::Vector2f &a, const sf::Vector2f &b, float t);
-    sf::Vector2f bezier2(sf::Vector2f &p0, sf::Vector2f &p1, sf::Vector2f &p2, sf::Vector2f &p3, float t);
+    CubicBezierPoints bezier2(sf::Vector2f &p0, sf::Vector2f &p1, sf::Vector2f &p2, sf::Vector2f &p3, float t);
 
     void RenderInternal(sf::RenderWindow &window);
     void RenderAnimationInternal(sf::RenderWindow &window);
