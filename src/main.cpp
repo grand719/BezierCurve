@@ -1,4 +1,3 @@
-#include "CubicBezier.h"
 #include "CurveCreator.h"
 #include "stdio.h"
 #include <SFML/Graphics.hpp>
@@ -6,8 +5,8 @@
 int main()
 {
     auto window = sf::RenderWindow(sf::VideoMode({800u, 600u}), "CMake SFML Project");
-    // window.setFramerateLimit(60);
-
+    window.setFramerateLimit(60);
+    float targetDeltaTime = 1.f / 60.f;
     float mTargetFrameRate = 60.f;
     float accumulatedTime = 0.f;
 
@@ -60,17 +59,9 @@ int main()
             }
         }
 
-        float targetDeltaTime = 1.f / mTargetFrameRate;
-
-        float frameDeltaTime = mTickClock.restart().asSeconds();
-        accumulatedTime += frameDeltaTime;
-        while (accumulatedTime > targetDeltaTime)
-        {
-            accumulatedTime -= targetDeltaTime;
-            creator.Tick();
-            window.clear();
-            creator.Render(window);
-            window.display();
-        }
+        creator.Tick();
+        window.clear();
+        creator.Render(window);
+        window.display();
     }
 }
